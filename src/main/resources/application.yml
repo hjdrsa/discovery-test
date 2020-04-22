@@ -1,0 +1,15 @@
+spring:
+    datasource:
+        url: jdbc:h2:mem:discovery
+        driverClassName: org.h2.Driver
+        username: disco
+        password:
+    jpa:
+        hibernate:
+            ddl-auto: none        
+        
+    h2:
+        console:
+            enabled: true
+            settings:
+                web-allow-others: true 
