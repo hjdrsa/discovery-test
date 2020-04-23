@@ -29,3 +29,43 @@ To get the project up and running on your local machine, do the following:
  4. Run `docker run --name discovery-test -d -p 15000:15000 discovery-test:1.0.0`
  5. Wait for the components to be up and running.
  6. Navigate to [http://localhost:15000/swagger-ui.html](http://localhost:15000/swagger-ui.html)
+
+## Reporting
+
+Database script reporting found under `src\main\resources\Report-Scripts\Reports.sql`
+
+ 1. Navigate to [http://localhost:15000/h2-console/login.do](http://localhost:15000/h2-console/login.do)
+ 2. Enter JDBC URL : `jdbc:h2:mem:discovery` 
+ 3. Enter username: `disco`
+ 4. Click connect
+
+### Find the transactional account per client with the highest balance
+
+    SELECT C.CLIENT_ID, C.SURNAME, CA.CLIENT_ACCOUNT_NUMBER, T.DESCRIPTION ,MAXBALANCE 
+    FROM CLIENT C 
+    LEFT JOIN (
+        SELECT A.CLIENT_ID, MAX(A.DISPLAY_BALANCE)  AS MAXBALANCE
+        FROM CLIENT_ACCOUNT A GROUP BY A.CLIENT_ID 
+    ) M ON M.CLIENT_ID = C.CLIENT_ID
+    LEFT JOIN CLIENT_ACCOUNT CA ON CA.CLIENT_ID = M.CLIENT_ID AND  CA.DISPLAY_BALANCE =  MAXBALANCE
+    LEFT JOIN ACCOUNT_TYPE T ON T.ACCOUNT_TYPE_CODE  = CA.ACCOUNT_TYPE_CODE ORDER BY MAXBALANCE DESC;
+
+### Calculate aggregate financial position per client
+
+    SELECT CONCAT(C.TITLE, '  ', C.NAME ,'  ',C.SURNAME) as CLIENT  ,LOAN.LOANBALANCE AS "Loan Balance", TRAN.TRANSACTIONBALANCE AS "Transactional Balance", EXPO.TOTALEXPO AS "Net Position"
+    FROM CLIENT C
+    LEFT JOIN (SELECT A.CLIENT_ID, SUM(A.DISPLAY_BALANCE)  AS TRANSACTIONBALANCE
+              FROM CLIENT_ACCOUNT A  
+              JOIN ACCOUNT_TYPE T ON T.ACCOUNT_TYPE_CODE  = A.ACCOUNT_TYPE_CODE
+              WHERE T.TRANSACTIONAL = 'true'
+              GROUP BY A.CLIENT_ID, T.TRANSACTIONAL) TRAN 
+    ON TRAN.CLIENT_ID = C.CLIENT_ID
+    LEFT JOIN (SELECT A.CLIENT_ID, SUM(A.DISPLAY_BALANCE)  AS LOANBALANCE
+              FROM CLIENT_ACCOUNT A  
+              WHERE A.ACCOUNT_TYPE_CODE  = 'HLOAN' OR A.ACCOUNT_TYPE_CODE  = 'PLOAN'
+              GROUP BY A.CLIENT_ID) LOAN 
+    ON LOAN.CLIENT_ID = C.CLIENT_ID
+    LEFT JOIN (SELECT A.CLIENT_ID, SUM(A.DISPLAY_BALANCE)  AS TOTALEXPO
+              FROM CLIENT_ACCOUNT A  
+              GROUP BY A.CLIENT_ID) EXPO
+    ON EXPO.CLIENT_ID = C.CLIENT_ID;
