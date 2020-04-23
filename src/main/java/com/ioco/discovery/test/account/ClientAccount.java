@@ -78,13 +78,25 @@ public class ClientAccount implements Serializable {
     View.List.class,
   })
   @Transient
-  private BigDecimal convertedBalance;
+  private BigDecimal forexBalance;
+  
+  @JsonView({
+    View.List.class,
+  })
+  @Transient
+  private BigDecimal forexDisplayBalance;
 
-  public BigDecimal getConvertedBalance() {
+  public BigDecimal getForexBalance() {
     if (currency.getCurrencyConversionRate().getConversionIndicator().equals("*")) {
-      return displayBalance.divide(currency.getCurrencyConversionRate().getRate(), currency.getDecimalPlaces(), RoundingMode.HALF_UP);
+      forexBalance = displayBalance.divide(currency.getCurrencyConversionRate().getRate(), 5, RoundingMode.HALF_UP);
+      return forexBalance;
     } else {
-      return displayBalance.multiply(currency.getCurrencyConversionRate().getRate()).setScale(currency.getDecimalPlaces(), RoundingMode.HALF_UP);
+      forexBalance = displayBalance.multiply(currency.getCurrencyConversionRate().getRate()).setScale(5, RoundingMode.HALF_UP);
+      return forexBalance;
     }
+  }
+  
+  public BigDecimal getForexDisplayBalance() {
+      return forexBalance.setScale(currency.getDecimalPlaces(), RoundingMode.HALF_UP);
   }
 }

@@ -19,4 +19,10 @@ public interface AccountRepository extends JpaRepository<ClientAccount, String>{
   @Query("SELECT c FROM ClientAccount c WHERE client.id = :id AND accountType.transactional = :transactional ORDER BY displayBalance DESC")
   List<ClientAccount> findbyClientIdAndTransactional(@Param("id") Integer id, @Param("transactional") Boolean transactional);
   
+  @Query("SELECT c FROM ClientAccount c WHERE client.id = :id AND accountType.accountTypeCode = :accountTypeCode ORDER BY displayBalance DESC")
+  List<ClientAccount> findbyClientIdAndAccountTypeCode(@Param("id") Integer id, @Param("accountTypeCode") AccountTypeCode accountTypeCode);
+  
+  @Query("SELECT c FROM ClientAccount c WHERE client.id = :id AND accountType.transactional = :transactional AND accountType.accountTypeCode = :accountTypeCode ORDER BY displayBalance DESC")
+  List<ClientAccount> findbyClientIdAndTransactionalAndAccountTypeCode(@Param("id") Integer id, @Param("transactional") Boolean transactional, @Param("accountTypeCode") AccountTypeCode accountTypeCode);
+  
 }

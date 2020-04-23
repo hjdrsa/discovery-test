@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @Slf4j
 @RestController
-@RequestMapping("clients/{clientId}/accounts/")
+@RequestMapping("clients/{clientId}/accounts")
 public class AccountController {
   
   @Autowired
@@ -35,15 +35,19 @@ public class AccountController {
                         description = "SUCCESS")
             }
     )
-  public ResponseEntity<List<ClientAccount>> adminPage(@PathVariable Integer clientId, @RequestParam(value = "transactional", required = false) Boolean transactional) {
+  public ResponseEntity<List<ClientAccount>> adminPage(@PathVariable Integer clientId, @RequestParam(value = "transactional", required = false) Boolean transactional, @RequestParam(value = "accountTypeCode", required = false) AccountTypeCode accountTypeCode) {
     
     List<ClientAccount> clientAccounts = null;
     
-    if (transactional == null) {
-      clientAccounts = accountRepository.findbyClientId(clientId);
-    } else {
+    if (transactional != null && accountTypeCode != null) {
+      clientAccounts = accountRepository.findbyClientIdAndTransactionalAndAccountTypeCode(clientId, transactional, accountTypeCode);
+    } else if (transactional != null) {
       clientAccounts = accountRepository.findbyClientIdAndTransactional(clientId, transactional);
-    }
+    } else if (accountTypeCode != null) {
+      clientAccounts = accountRepository.findbyClientIdAndAccountTypeCode(clientId, accountTypeCode);
+    } else if (transactional == null) {
+      clientAccounts = accountRepository.findbyClientId(clientId);
+    } 
     
     return ResponseEntity.ok(clientAccounts);
   }
