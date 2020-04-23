@@ -101,9 +101,7 @@ public class AtmService {
       Optional<ClientAccount> clientAccountOptional = accountRepository.findById(accountNumber);
       if (clientAccountOptional.isPresent()) {
         ClientAccount clientAccount = clientAccountOptional.get();
-        withdrawResponse.setOldBalance(clientAccount.getDisplayBalance());
         clientAccount.setDisplayBalance(clientAccount.getDisplayBalance().subtract(originalAmount));
-        withdrawResponse.setNewBalance(clientAccount.getDisplayBalance());
         accountRepository.saveAndFlush(clientAccount);
       }
     }

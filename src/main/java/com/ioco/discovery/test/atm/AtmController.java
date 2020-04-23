@@ -74,7 +74,7 @@ public class AtmController {
 
     Optional<ClientAccount> clientAccountOptional = accountRepository.findById(withdrawRequest.getAccountNumber());
 
-    if (clientAccountOptional.isEmpty()) {
+    if (clientAccountOptional.isPresent() == false) {
       return ResponseEntity.badRequest().build();
     } else {
 

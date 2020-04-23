@@ -18,8 +18,6 @@ public class WithdrawResponse {
   
   private String message;
   private Map<BigDecimal,Integer> notes = new HashMap();
-  private BigDecimal oldBalance;
-  private BigDecimal newBalance;
   
   public BigDecimal totalNoteValue(){
     
