@@ -2,7 +2,7 @@
  * Author:  hjd
  * Description: Find the transactional account per client with the highest balance
  */
-SELECT C.CLIENT_ID, C.SURNAME, CA.CLIENT_ACCOUNT_NUMBER, T.DESCRIPTION ,MAXBALANCE 
+SELECT C.CLIENT_ID as "Client Id", C.SURNAME as "Client Surname", CA.CLIENT_ACCOUNT_NUMBER as "Client Account Number", T.DESCRIPTION as "Account Description" ,MAXBALANCE as "Display Balance"
 FROM CLIENT C 
 LEFT JOIN (
     SELECT A.CLIENT_ID, MAX(A.DISPLAY_BALANCE)  AS MAXBALANCE
@@ -16,7 +16,7 @@ LEFT JOIN ACCOUNT_TYPE T ON T.ACCOUNT_TYPE_CODE  = CA.ACCOUNT_TYPE_CODE ORDER BY
  * Author:  hjd
  * Description: Calculate aggregate financial position per client
  */
-SELECT CONCAT(C.TITLE, '  ', C.NAME ,'  ',C.SURNAME) as CLIENT  ,LOAN.LOANBALANCE AS "Loan Balance", TRAN.TRANSACTIONBALANCE AS "Transactional Balance", EXPO.TOTALEXPO AS "Net Position"
+SELECT CONCAT(C.TITLE, '  ', C.NAME ,'  ',C.SURNAME) as "Client"  ,LOAN.LOANBALANCE AS "Loan Balance", TRAN.TRANSACTIONBALANCE AS "Transactional Balance", EXPO.TOTALEXPO AS "Net Position"
 FROM CLIENT C
 LEFT JOIN (SELECT A.CLIENT_ID, SUM(A.DISPLAY_BALANCE)  AS TRANSACTIONBALANCE
           FROM CLIENT_ACCOUNT A  
